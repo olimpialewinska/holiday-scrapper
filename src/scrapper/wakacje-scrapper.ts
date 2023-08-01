@@ -1,13 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { Item, Scrapper } from './common';
+import { Item, Scrapper, parseDate } from './common.js';
 import * as cheerio from 'cheerio';
 import { exec } from '../utils/child_process.js';
 
-const maxPrice = 1500;
-
 @Injectable()
 export class WakacjeScrapper implements Scrapper {
-  public async fetch(): Promise<Item[]> {
+  public async fetch(maxPrice: number): Promise<Item[]> {
     let lastPrice = 0;
     let page = 1;
 
@@ -30,6 +28,7 @@ export class WakacjeScrapper implements Scrapper {
             .text();
           const title = $(element)
             .find('span[data-testid="offer-listing-name"]')
+            .first()
             .text();
           const rating = $(element)
             .find(
@@ -47,6 +46,13 @@ export class WakacjeScrapper implements Scrapper {
             .replace(/\D/g, '');
           const offerLink = $(element).attr('href');
 
+          const [startDateStr, endDateStr] = duration
+            .split('- ')
+            .map((date) => date.trim());
+
+          const startDate = parseDate(startDateStr);
+          const endDate = parseDate(endDateStr);
+
           const offerInfo = {
             offerLink,
             title,
@@ -54,6 +60,8 @@ export class WakacjeScrapper implements Scrapper {
             rating,
             pricePerPerson,
             duration,
+            startDate: new Date(startDate),
+            endDate: new Date(endDate),
             provider: 'https://www.wakacje.pl',
           };
 
@@ -62,7 +70,6 @@ export class WakacjeScrapper implements Scrapper {
 
         lastPrice = parseInt(items[items.length - 1].pricePerPerson, 10);
 
-        console.log('last', lastPrice);
         page++;
       }
       return items;
