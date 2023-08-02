@@ -4,7 +4,7 @@ import { Scrapper } from './common.js';
 import { FlyScrapper } from './fly-scrapper.js';
 import { TravelScrapper } from './travel-scrapper.js';
 
-const maxPrice = 2000;
+const maxPrice = 1000;
 
 @Injectable()
 export class ScrapperService {
@@ -14,18 +14,13 @@ export class ScrapperService {
     private readonly travelScrapper: TravelScrapper,
   ) {}
 
-  // public get scrappers(): Scrapper[] {
-  //   return [this.wakacjeScrapper, this.flyScrapper, this.travelScrapper];
-  // }
-
-  // public async run(): Promise<void> {
-  //   for (const scrapper of this.scrappers) {
-  //     const items = await scrapper.fetch(maxPrice);
-  //     console.log(items);
-  //   }
-  // }
+  public get scrappers(): Scrapper[] {
+    return [this.wakacjeScrapper, this.flyScrapper, this.travelScrapper];
+  }
 
   public async run(): Promise<void> {
-    const flyScrapperItems = await this.travelScrapper.fetch(maxPrice);
+    for (const scrapper of this.scrappers) {
+      const items = await scrapper.fetch(maxPrice);
+    }
   }
 }

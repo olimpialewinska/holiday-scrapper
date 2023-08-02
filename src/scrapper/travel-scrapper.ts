@@ -1,13 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Item, Scrapper } from './common.js';
-import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { exec } from '../utils/child_process.js';
+import puppeteer from 'puppeteer';
 
 @Injectable()
 export class TravelScrapper implements Scrapper {
   public async fetch(maxPrice: number): Promise<Item[]> {
-    let page = 1;
     let lastPrice = 0;
 
     const items: Item[] = [];
@@ -18,24 +16,33 @@ export class TravelScrapper implements Scrapper {
     const year = date.getFullYear();
 
     const dateStr = `${day}.${month}.${year}`;
-
     const baseUrl = `https://www.travelplanet.pl/wakacje/?s_action=TRIPS_SEARCH&d_start_from=${dateStr}&nl_category_id%5B0%5D=1&nl_transportation_id%5B0%5D=3&s_holiday_target=tours&sort=c_price`;
-    const additionalParams = `&nl_not_ck_id%5B0%5D=102556&b_private_offers=1&nl_occupancy_adults=2`;
+
+    const browser = await puppeteer.launch({
+      headless: 'new',
+    });
+    const browserPage = await browser.newPage();
+
+    await browserPage.goto(baseUrl, {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
+    });
+
+    await browserPage.waitForSelector(
+      '#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll',
+    );
+
+    await browserPage.click(
+      '#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll',
+    );
+
     try {
       while (lastPrice <= maxPrice) {
-        const url = `${baseUrl}&page=${page}${additionalParams}${this.getOffsets(
-          page,
-        )}`;
-
-        const result = await axios.get(url, {
-          headers: {
-            'User-Agent':
-              'Mozilla/5.0 (X11; Linux x86_64; rv:88.0) Gecko/20100101 Firefox/88.0',
-          },
+        await browserPage.waitForSelector('.loader__loader', {
+          hidden: true,
         });
-
-        const html = result.data;
-
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const html = await browserPage.content();
         const $ = cheerio.load(html);
 
         $('div.b-product-list-2__inner').each((index, element) => {
@@ -71,7 +78,6 @@ export class TravelScrapper implements Scrapper {
             .text()
             .trim();
 
-          //delet all white spaces
           const pricePerPerson = offerElement
             .find('strong.price__highlight')
             .text()
@@ -114,10 +120,37 @@ export class TravelScrapper implements Scrapper {
 
         lastPrice = parseInt(items[items.length - 1].pricePerPerson, 10);
 
-        page++;
+        const nextPageButtonSelector =
+          'button.pagination__link.pagination__link--next';
+        await browserPage.waitForSelector(nextPageButtonSelector, {
+          visible: true,
+        });
+        const nextPageButton = await browserPage.$(nextPageButtonSelector);
+
+        if (nextPageButton) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await nextPageButton.click();
+
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
+          await browserPage.waitForSelector('.loader__loader', {
+            hidden: false,
+          });
+
+          await browserPage.waitForTimeout(1000);
+        } else {
+          break;
+        }
       }
-    } catch (error) {}
-    return [];
+    } catch (error) {
+      return [];
+    } finally {
+      await browser.close();
+    }
+
+    const deduplikatedItems = Array.from(new Set(items));
+
+    return deduplikatedItems;
   }
 
   private parseCustomDate(dateStr: string): Date {
@@ -129,21 +162,5 @@ export class TravelScrapper implements Scrapper {
       return new Date(year, month, day);
     }
     return null;
-  }
-
-  private getOffsets(page: number): string {
-    if (page === 1) {
-      return '';
-    } else {
-      const offsetTraveltainment = (page - 1) * 15;
-      const offsetTraso = page - 1;
-      const offsetInvia = page - 1;
-      const offsetMerlinX = (page - 1) * 15;
-      const offsetHotel = 0;
-      const itemsPerPage = 15;
-      const boxesFound = 15;
-
-      return `&offsets=traveltainment%3A${offsetTraveltainment}%3Btraso%3A${offsetTraso}%3Binvia%3A${offsetInvia}%3BmerlinX%3A${offsetMerlinX}%3Bhotel%3A${offsetHotel}%3BitemsPerPage%3A${itemsPerPage}%3BboxesFound%3A${boxesFound}`;
-    }
   }
 }

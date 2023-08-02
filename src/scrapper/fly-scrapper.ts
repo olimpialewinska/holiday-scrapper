@@ -76,9 +76,9 @@ export class FlyScrapper implements Scrapper {
         page++;
       }
     } catch (error) {
-      console.error(error);
+      return [];
     }
 
-    return [];
+    return items;
   }
 }
