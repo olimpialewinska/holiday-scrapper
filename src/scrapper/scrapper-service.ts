@@ -26,7 +26,6 @@ export class ScrapperService {
   // }
 
   public async run(): Promise<void> {
-    const flyScrapperItems = await this.flyScrapper.fetch(maxPrice);
-    console.log(flyScrapperItems);
+    const flyScrapperItems = await this.travelScrapper.fetch(maxPrice);
   }
 }

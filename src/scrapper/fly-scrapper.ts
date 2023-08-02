@@ -67,7 +67,6 @@ export class FlyScrapper implements Scrapper {
             endDate,
             provider: 'https://fly.pl/',
           };
-          console.log(offerInfo);
 
           items.push(offerInfo);
         });
