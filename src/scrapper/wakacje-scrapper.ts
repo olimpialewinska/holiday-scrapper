@@ -30,20 +30,26 @@ export class WakacjeScrapper implements Scrapper {
             .find('span[data-testid="offer-listing-name"]')
             .first()
             .text();
-          const rating = $(element)
+          const ratingString = $(element)
             .find(
               '.yzr5qg-2.klYBgC.nmbz4g-6.HhwrO .sc-jfJzZe.bcQBUy .sc-jSgupP.hKopHK',
             )
             .text();
+
+          const rating = ratingString
+            ? parseFloat(ratingString.replace(',', '.'))
+            : 0;
           const duration = $(element)
             .find('span[data-testid="offer-listing-duration-date"]')
             .text()
             .trim();
-          const pricePerPerson = $(element)
+          const pricePerPersonString = $(element)
             .find('h4.sc-1x38ct5-4.sc-1v2crin-2.kuYJpT.jRRgxG')
             .text()
             .trim()
             .replace(/\D/g, '');
+
+          const pricePerPerson = parseInt(pricePerPersonString, 10);
           const offerLink = $(element).attr('href');
 
           const [startDateStr, endDateStr] = duration
@@ -63,12 +69,14 @@ export class WakacjeScrapper implements Scrapper {
             startDate: new Date(startDate),
             endDate: new Date(endDate),
             provider: 'https://www.wakacje.pl',
+            image: '',
+            mealType: '',
           };
 
           items.push(offerInfo);
         });
 
-        lastPrice = parseInt(items[items.length - 1].pricePerPerson, 10);
+        lastPrice = items[items.length - 1].pricePerPerson;
 
         page++;
       }

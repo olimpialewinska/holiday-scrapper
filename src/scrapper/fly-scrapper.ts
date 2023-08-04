@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Item, Scrapper, parseDate } from './common.js';
 import { exec } from '../utils/child_process.js';
 import * as cheerio from 'cheerio';
-import { off } from 'process';
 
 @Injectable()
 export class FlyScrapper implements Scrapper {
@@ -33,11 +32,13 @@ export class FlyScrapper implements Scrapper {
             .map((_, el) => $(el).text())
             .get()
             .join('/');
-          const rating =
+          const ratingString =
             offerElement
               .find('.rating.rating-3')
               .attr('class')
               ?.split('-')[1] || '0';
+
+          const rating = parseFloat(ratingString.replace(',', '.'));
 
           const dateRange = $('div.info span').first().text().trim();
 
@@ -52,9 +53,11 @@ export class FlyScrapper implements Scrapper {
           const startDate = parseDate(startDateStr);
           const endDate = parseDate(endDateStr);
 
-          const pricePerPerson = offerElement
+          const pricePerPersonString = offerElement
             .find('meta[property="schema:price"]')
             .attr('content');
+
+          const pricePerPerson = parseInt(pricePerPersonString, 10);
 
           const offerInfo = {
             offerLink,
@@ -66,12 +69,14 @@ export class FlyScrapper implements Scrapper {
             startDate,
             endDate,
             provider: 'https://fly.pl/',
+            image: '',
+            mealType: '',
           };
 
           items.push(offerInfo);
         });
 
-        lastPrice = parseInt(items[items.length - 1].pricePerPerson, 10);
+        lastPrice = items[items.length - 1]?.pricePerPerson || 0;
 
         page++;
       }

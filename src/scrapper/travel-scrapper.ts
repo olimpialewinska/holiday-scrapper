@@ -78,10 +78,12 @@ export class TravelScrapper implements Scrapper {
             .text()
             .trim();
 
-          const pricePerPerson = offerElement
+          const pricePerPersonString = offerElement
             .find('strong.price__highlight')
             .text()
             .replace(/\s/g, '');
+
+          const pricePerPerson = parseInt(pricePerPersonString, 10);
 
           const styleAttributeValue = offerElement
             .find('span.stars')
@@ -113,12 +115,13 @@ export class TravelScrapper implements Scrapper {
             endDate,
             mealType,
             provider,
+            image: '',
           };
 
           items.push(offerInfo);
         });
 
-        lastPrice = parseInt(items[items.length - 1].pricePerPerson, 10);
+        lastPrice = items[items.length - 1]?.pricePerPerson;
 
         const nextPageButtonSelector =
           'button.pagination__link.pagination__link--next';

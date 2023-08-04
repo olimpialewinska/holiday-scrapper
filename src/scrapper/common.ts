@@ -6,13 +6,14 @@ export interface Item {
   offerLink: string;
   title: string;
   destination: string;
-  rating?: string | number;
-  pricePerPerson: string;
+  rating: number;
+  pricePerPerson: number;
   duration: string;
-  startDate?: Date;
-  endDate?: Date;
+  startDate: Date;
+  endDate: Date;
   provider: string;
-  mealType?: string;
+  mealType: string;
+  image: string;
 }
 
 export function parseDate(dateStr: string): Date {
