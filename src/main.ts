@@ -3,12 +3,12 @@ import { AppModule } from './app.module.js';
 import { ScrapperService } from './scrapper/scrapper-service.js';
 import { transporter } from './utils/nodemailer-config.js';
 
-const mailOptions = {
-  from: 'botholiday1@gmail.com',
-  to: 'olim1003@gmail.com',
-  subject: 'Subject',
-  text: 'Email content',
-};
+// const mailOptions = {
+//   from: 'botholiday1@gmail.com',
+//   to: 'olim1003@gmail.com',
+//   subject: 'Subject',
+//   html: '<h1>Email content</h1>',
+// };
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

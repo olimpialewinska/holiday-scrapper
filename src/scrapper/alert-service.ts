@@ -2,6 +2,10 @@ import { MikroORM } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { User } from '../entities/User.js';
 import { Item } from './common.js';
+import { Preferences } from '../entities/Preferences.js';
+import { createTqdm } from '../utils/threads/tqdm.js';
+import { limitedArrayMap } from '../utils/threads/threads.js';
+import { transporter } from '../utils/nodemailer-config.js';
 
 export class AlertService {
   constructor(
@@ -9,31 +13,59 @@ export class AlertService {
     private readonly em: EntityManager,
   ) {}
 
-  //   public async comparePreferencesWithOffers(newOffers): Promise<void> {
-  //     const users = await this.getAllUsersWithPreferences();
-  //     users.forEach((user) => {
-  //       const userPreferences = user.preferences;
-  //       const matchingOffers = [];
+  public async sendOffers(newOffers: Item[]): Promise<void> {
+    const users = await this.getAllUsers();
 
-  //       newOffers.forEach((offer: Item) => {
-  //         if (offer.destination === userPreferences.destination) {
-  //           if (offer.pricePerPerson <= userPreferences.pricePerPerson) {
-  //             matchingOffers.push(offer);
-  //           }
-  //         }
-  //       });
+    const tqdm = createTqdm(users.length);
 
-  //       if (matchingOffers.length > 0) {
-  //         this.sendEmailToUser(user, matchingOffers);
-  //       }
-  //     });
-  //   }
+    await limitedArrayMap(
+      users,
+      tqdm(async (user) => {
+        const userPreferences = await this.getPreferences(user.email);
 
-  //   public async getAllUsersWithPreferences(): Promise<User[]> {
-  //     return this.em.find(User, {}, { populate: ['preferences'] });
-  //   }
+        if (!userPreferences) {
+          return;
+        }
 
-  public async sendEmailToUser(user: User, offers: Item[]): Promise<void> {
-    console.log('Wysyłam maila do użytkownika', user.email);
+        const matchingOffers: Item[] = [];
+
+        newOffers.forEach((offer: Item) => {
+          if (offer.destination === userPreferences.destination) {
+            if (offer.pricePerPerson <= userPreferences.pricePerPerson) {
+              matchingOffers.push(offer);
+            }
+          }
+        });
+
+        if (matchingOffers.length > 0) {
+          this.sendEmailToUser(user, matchingOffers);
+        }
+      }),
+    );
+  }
+
+  private async getAllUsers() {
+    return await this.em.find(User, {});
+  }
+
+  private async getPreferences(email: string) {
+    return await this.em.findOne(Preferences, { user: { email } });
+  }
+
+  private async sendEmailToUser(user: User, offers: Item[]): Promise<void> {
+    const mailOptions = {
+      from: 'botholiday1@gmail.com',
+      to: user.email,
+      subject: 'Holiday offers',
+      html: `<h1>Hi ${user.email}!</h1>
+        <p>Here are some offers that match your preferences:</p>
+        <ul>
+          ${offers.map((offer) => `<li>${offer.offerLink}</li>`).join('')}
+          </ul>
+          <p>Have a nice day!</p>
+            <p>BotHoliday</p>`,
+    };
+
+    await transporter.sendMail(mailOptions);
   }
 }

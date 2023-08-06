@@ -4,6 +4,7 @@ import { Scrapper } from './common.js';
 import { FlyScrapper } from './fly-scrapper.js';
 import { TravelScrapper } from './travel-scrapper.js';
 import { DbOfferService } from './db-service.js';
+import { AlertService } from './alert-service.js';
 
 const maxPrice = 1000;
 
@@ -14,6 +15,7 @@ export class ScrapperService {
     private readonly flyScrapper: FlyScrapper,
     private readonly travelScrapper: TravelScrapper,
     private readonly dbService: DbOfferService,
+    private readonly alertService: AlertService,
   ) {}
 
   public get scrappers(): Scrapper[] {
@@ -31,6 +33,10 @@ export class ScrapperService {
     const newOffers = await this.dbService.addOffer(items);
 
     console.log(`Added ${newOffers.length} new offers`);
+
+    await this.alertService.sendOffers(newOffers);
+
+    console.log('Finished running scrapper');
   }
   public async startScheduledScraping(): Promise<void> {
     await this.run();

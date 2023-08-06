@@ -1,5 +1,4 @@
 import { Entity, OneToOne, PrimaryKey, Property } from '@mikro-orm/core';
-import bcrypt from 'bcrypt';
 import { User } from './User.js';
 
 @Entity()
@@ -31,6 +30,6 @@ export class Preferences {
   @Property()
   mealType!: string;
 
-  @OneToOne(() => User, { lazy: true })
+  @OneToOne(() => User)
   user: User;
 }
