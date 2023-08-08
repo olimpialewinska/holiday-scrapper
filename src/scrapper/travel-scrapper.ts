@@ -115,7 +115,7 @@ export class TravelScrapper implements Scrapper {
             endDate,
             mealType,
             provider,
-            image: '',
+            image: 'a',
           };
 
           items.push(offerInfo);
@@ -153,6 +153,7 @@ export class TravelScrapper implements Scrapper {
 
     const deduplikatedItems = Array.from(new Set(items));
 
+    console.log(deduplikatedItems.length);
     return deduplikatedItems;
   }
 

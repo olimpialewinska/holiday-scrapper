@@ -1,4 +1,3 @@
-import { MikroORM } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
 import { Item } from './common.js';
@@ -8,10 +7,7 @@ import { Offer } from '../entities/Offer.js';
 
 @Injectable()
 export class DbOfferService {
-  constructor(
-    private readonly orm: MikroORM,
-    private readonly em: EntityManager,
-  ) {}
+  constructor(private readonly em: EntityManager) {}
 
   public async addOffer(offers: Item[]): Promise<Item[]> {
     const tqdm = createTqdm(offers.length);
@@ -25,12 +21,23 @@ export class DbOfferService {
           offerLink: offer.offerLink,
         });
 
-        if (existingOffer) {
-          return;
-        }
+        if (!existingOffer) {
+          const newOffer = new Offer();
+          newOffer.offerLink = offer.offerLink;
+          newOffer.title = offer.title;
+          newOffer.destination = offer.destination;
+          newOffer.rating = offer.rating;
+          newOffer.pricePerPerson = offer.pricePerPerson;
+          newOffer.duration = offer.duration;
+          newOffer.startDate = offer.startDate;
+          newOffer.endDate = offer.endDate;
+          newOffer.provider = offer.provider;
+          newOffer.mealType = offer.mealType;
+          newOffer.image = offer.image;
 
-        newOffers.push(existingOffer);
-        await this.em.persistAndFlush(offer);
+          newOffers.push(newOffer);
+          await this.em.persistAndFlush(newOffer);
+        }
       }),
     );
 

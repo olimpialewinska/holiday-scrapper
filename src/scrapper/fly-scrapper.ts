@@ -69,8 +69,8 @@ export class FlyScrapper implements Scrapper {
             startDate,
             endDate,
             provider: 'https://fly.pl/',
-            image: '',
-            mealType: '',
+            image: 'a',
+            mealType: 'a',
           };
 
           items.push(offerInfo);
@@ -84,6 +84,7 @@ export class FlyScrapper implements Scrapper {
       return [];
     }
 
+    console.log('Fly.pl: ', items.length);
     return items;
   }
 }

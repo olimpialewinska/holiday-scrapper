@@ -1,18 +1,21 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property, t } from '@mikro-orm/core';
 
 @Entity()
 export class Offer {
-  @PrimaryKey()
+  @PrimaryKey({ autoincrement: true })
+  id!: number;
+
+  @Property({ unique: true, nullable: false, length: 10000 })
   offerLink!: string;
 
-  @Property()
+  @Property({ length: 5000 })
   title!: string;
 
-  @Property()
+  @Property({ length: 5000 })
   destination!: string;
 
-  @Property()
-  rating: number;
+  @Property({ nullable: true })
+  rating!: number;
 
   @Property()
   pricePerPerson!: number;
@@ -26,12 +29,12 @@ export class Offer {
   @Property()
   endDate!: Date;
 
-  @Property()
+  @Property({ length: 5000 })
   provider!: string;
 
   @Property()
-  mealType!: string;
+  mealType!: string | '';
 
   @Property()
-  image!: string;
+  image!: string | '';
 }

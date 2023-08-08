@@ -29,6 +29,7 @@ export class ScrapperService {
     const allItems = await Promise.all(promises);
 
     const items = allItems.flat();
+    console.log(`Found ${items.length} offers`);
 
     const newOffers = await this.dbService.addOffer(items);
 

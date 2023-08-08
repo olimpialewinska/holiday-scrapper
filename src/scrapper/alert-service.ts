@@ -5,12 +5,13 @@ import { Item } from './common.js';
 import { Preferences } from '../entities/Preferences.js';
 import { createTqdm } from '../utils/threads/tqdm.js';
 import { limitedArrayMap } from '../utils/threads/threads.js';
-import { transporter } from '../utils/nodemailer-config.js';
+import { NodemailerService } from '../utils/nodemailer-config.js';
 
 export class AlertService {
   constructor(
     private readonly orm: MikroORM,
     private readonly em: EntityManager,
+    private readonly transporter: NodemailerService,
   ) {}
 
   public async sendOffers(newOffers: Item[]): Promise<void> {
@@ -44,8 +45,11 @@ export class AlertService {
     );
   }
 
-  private async getAllUsers() {
-    return await this.em.find(User, {});
+  async getAllUsers(): Promise<User[]> {
+    const userRepository = this.em.getRepository(User);
+    const users = await userRepository.findAll();
+
+    return users;
   }
 
   private async getPreferences(email: string) {
@@ -53,19 +57,13 @@ export class AlertService {
   }
 
   private async sendEmailToUser(user: User, offers: Item[]): Promise<void> {
-    const mailOptions = {
-      from: 'botholiday1@gmail.com',
-      to: user.email,
-      subject: 'Holiday offers',
-      html: `<h1>Hi ${user.email}!</h1>
-        <p>Here are some offers that match your preferences:</p>
-        <ul>
-          ${offers.map((offer) => `<li>${offer.offerLink}</li>`).join('')}
-          </ul>
-          <p>Have a nice day!</p>
-            <p>BotHoliday</p>`,
-    };
+    const html = `<h1>Hi ${
+      user.email
+    }!</h1> <p>Here are some offers that match your preferences:</p><ul>  ${offers
+      .map((offer) => `<li>${offer.offerLink}</li>`)
+      .join('')}
+</ul><p>Have a nice day!</p><p>BotHoliday</p>`;
 
-    await transporter.sendMail(mailOptions);
+    await this.transporter.sendEmail(user.email, 'New offers!', html);
   }
 }

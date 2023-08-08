@@ -69,8 +69,8 @@ export class WakacjeScrapper implements Scrapper {
             startDate: new Date(startDate),
             endDate: new Date(endDate),
             provider: 'https://www.wakacje.pl',
-            image: '',
-            mealType: '',
+            image: 'a',
+            mealType: 'a',
           };
 
           items.push(offerInfo);
@@ -80,6 +80,7 @@ export class WakacjeScrapper implements Scrapper {
 
         page++;
       }
+      console.log('Wakacje.pl: ', items.length);
       return items;
     } catch (e) {
       return [];
