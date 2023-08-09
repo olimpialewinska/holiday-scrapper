@@ -83,8 +83,6 @@ export class FlyScrapper implements Scrapper {
     } catch (error) {
       return [];
     }
-
-    console.log('Fly.pl: ', items.length);
     return items;
   }
 }

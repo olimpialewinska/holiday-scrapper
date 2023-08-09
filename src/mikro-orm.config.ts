@@ -1,6 +1,6 @@
 import { Offer } from './entities/Offer.js';
 import { Preferences } from './entities/Preferences.js';
-import { User } from './entities/User.js';
+import { Users } from './entities/User.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { Options } from '@mikro-orm/postgresql';
 import { ConfigService } from '@nestjs/config';
@@ -13,14 +13,13 @@ export class MikroOrmConfigService {
     return {
       type: 'postgresql',
       allowGlobalContext: true,
-      entities: [User, Preferences, Offer],
+      entities: [Users, Preferences, Offer],
       dbName: this.config.get('DB_NAME'),
       user: this.config.get('DB_USER'),
       password: this.config.get('DB_PASSWORD'),
       host: 'localhost',
       port: 5432,
       entitiesTs: ['./src/entities'],
-      debug: true,
     };
   }
 }

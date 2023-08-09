@@ -1,35 +1,32 @@
 import { Entity, OneToOne, PrimaryKey, Property } from '@mikro-orm/core';
-import { User } from './User.js';
+import { Users } from './User.js';
 
 @Entity()
 export class Preferences {
   @PrimaryKey()
   userId!: number;
 
-  @Property()
+  @Property({ nullable: true })
   destination!: string;
 
-  @Property()
+  @Property({ nullable: true })
   rating!: number;
 
-  @Property()
+  @Property({ nullable: true })
   pricePerPerson!: number;
 
-  @Property()
+  @Property({ nullable: true })
   duration!: string;
 
-  @Property()
+  @Property({ nullable: true })
   startDate!: Date;
 
-  @Property()
+  @Property({ nullable: true })
   endDate!: Date;
 
-  @Property()
+  @Property({ nullable: true })
   provider!: string;
 
-  @Property()
+  @Property({ nullable: true })
   mealType!: string;
-
-  @OneToOne(() => User)
-  user: User;
 }

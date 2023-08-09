@@ -23,17 +23,12 @@ export class ScrapperService {
   }
 
   public async run(): Promise<void> {
-    console.log('Running scrapper');
-
     const promises = this.scrappers.map((scrapper) => scrapper.fetch(maxPrice));
     const allItems = await Promise.all(promises);
 
     const items = allItems.flat();
-    console.log(`Found ${items.length} offers`);
 
     const newOffers = await this.dbService.addOffer(items);
-
-    console.log(`Added ${newOffers.length} new offers`);
 
     await this.alertService.sendOffers(newOffers);
 

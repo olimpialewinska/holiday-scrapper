@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request, Post } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { PreferencesService } from './preferences.service.js';
 
@@ -7,11 +7,11 @@ export class PreferencesController {
   constructor(private readonly preferencesService: PreferencesService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Get('profile')
+  @Post('addPreferences')
   async addPreferences(@Request() req) {
     return await this.preferencesService.addPreferences(
-      req.user.email,
-      req.body,
+      req.body.email,
+      req.body.preferences,
     );
   }
 

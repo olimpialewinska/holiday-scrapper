@@ -80,7 +80,6 @@ export class WakacjeScrapper implements Scrapper {
 
         page++;
       }
-      console.log('Wakacje.pl: ', items.length);
       return items;
     } catch (e) {
       return [];

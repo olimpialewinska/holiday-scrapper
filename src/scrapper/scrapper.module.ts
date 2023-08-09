@@ -6,6 +6,7 @@ import { FlyScrapper } from './fly-scrapper.js';
 import { TravelScrapper } from './travel-scrapper.js';
 import { DbOfferService } from './db-service.js';
 import { AlertService } from './alert-service.js';
+import { NodemailerService } from '../utils/nodemailer-config.js';
 
 @Module({
   imports: [],
@@ -17,6 +18,7 @@ import { AlertService } from './alert-service.js';
     TravelScrapper,
     DbOfferService,
     AlertService,
+    NodemailerService,
   ],
 
   exports: [

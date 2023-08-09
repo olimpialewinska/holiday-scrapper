@@ -152,8 +152,6 @@ export class TravelScrapper implements Scrapper {
     }
 
     const deduplikatedItems = Array.from(new Set(items));
-
-    console.log(deduplikatedItems.length);
     return deduplikatedItems;
   }
 

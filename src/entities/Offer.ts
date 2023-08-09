@@ -5,7 +5,7 @@ export class Offer {
   @PrimaryKey({ autoincrement: true })
   id!: number;
 
-  @Property({ unique: true, nullable: false, length: 10000 })
+  @Property({ nullable: false, length: 10000 })
   offerLink!: string;
 
   @Property({ length: 5000 })

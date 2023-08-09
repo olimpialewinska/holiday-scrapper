@@ -16,7 +16,7 @@ async function bootstrap() {
   const generator = orm.getSchemaGenerator();
   await generator.updateSchema();
 
-  // const service = app.get(ScrapperService);
-  // await service.startScheduledScraping();
+  const service = app.get(ScrapperService);
+  await service.startScheduledScraping();
 }
 bootstrap();
