@@ -4,10 +4,14 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { v4 as uuidv4 } from 'uuid';
 import { Preferences } from '../entities/Preferences.js';
 import { Offer } from '../entities/Offer.js';
+import { NodemailerService } from '../utils/nodemailer-config.js';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly em: EntityManager,
+    private readonly mailer: NodemailerService,
+  ) {}
 
   async findOne(email: string): Promise<Users | undefined> {
     try {
@@ -18,11 +22,28 @@ export class UsersService {
   }
 
   async create(user: any): Promise<Users> {
-    const newUser = new Users();
-    newUser.email = user.email;
-    newUser.password = user.password;
-    await this.em.persistAndFlush(newUser);
-    return newUser;
+    try {
+      const newUser = new Users();
+      newUser.email = user.email;
+      newUser.password = user.password;
+      await this.em.persistAndFlush(newUser);
+      const html = `<h1>Welcome to Travel Agency</h1>
+    <p>Thank you for registering on our website.</p>
+    <p> Your account has been created. You can log in using the following credentials:</p>
+    <p>Username: ${newUser.email}</p>
+    <p>Password: ${newUser.password}</p>
+    <p>Confirm your email address by clicking on the link below:</p>
+    <a href="http://localhost:3000/auth/confirm/${newUser.email}">Confirm email</a>
+    <p>Have a nice day!</p>`;
+      await this.mailer.sendEmail(
+        newUser.email,
+        'Welcome to Travel Agency',
+        html,
+      );
+      return newUser;
+    } catch (error) {
+      return error.message;
+    }
   }
 
   async addPreferences(
@@ -48,5 +69,9 @@ export class UsersService {
 
   async getAllOffers() {
     return await this.em.find(Offer, {});
+  }
+
+  async update(user: Users) {
+    await this.em.persistAndFlush(user);
   }
 }

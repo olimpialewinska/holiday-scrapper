@@ -1,4 +1,11 @@
-import { Controller, Request, Post, UseGuards, Get } from '@nestjs/common';
+import {
+  Controller,
+  Request,
+  Post,
+  UseGuards,
+  Get,
+  Param,
+} from '@nestjs/common';
 import { LocalAuthGuard } from './local-auth.guard.js';
 import { AuthService } from './auth.service.js';
 import { JwtAuthGuard } from './jwt-auth.guard.js';
@@ -21,5 +28,16 @@ export class AuthController {
   @Post('auth/register')
   async register(@Request() req) {
     return this.authService.register(req.body);
+  }
+
+  @Get('auth/confirm/:email')
+  async confirmEmail(@Param('email') userId: string) {
+    const isConfirmed = await this.authService.confirmEmail(userId);
+
+    if (isConfirmed) {
+      return { message: 'Email confirmed successfully.' };
+    } else {
+      return { message: 'Email confirmation failed.' };
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service.js';
 import { JwtService } from '@nestjs/jwt';
+import e from 'express';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +20,9 @@ export class AuthService {
   }
 
   async login(user: any) {
+    if (user.emailVerified === false) {
+      return { message: 'Email not verified.' };
+    }
     const payload = { email: user.email, sub: user.userId };
     return {
       access_token: this.jwtService.sign(payload),
@@ -27,5 +31,22 @@ export class AuthService {
 
   async register(user: any) {
     return this.usersService.create(user);
+  }
+
+  async confirmEmail(email: string): Promise<boolean> {
+    const user = await this.usersService.findOne(email);
+
+    if (!user) {
+      return false;
+    }
+
+    user.emailVerified = true;
+    await this.usersService.update(user);
+    return true;
+  }
+
+  async isEmailConfirmed(email: string): Promise<boolean> {
+    const user = await this.usersService.findOne(email);
+    return user?.emailVerified || false;
   }
 }

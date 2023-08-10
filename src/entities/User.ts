@@ -10,4 +10,7 @@ export class Users {
 
   @Property()
   password!: string;
+
+  @Property({ default: false })
+  emailVerified!: boolean;
 }

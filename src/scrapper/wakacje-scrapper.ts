@@ -60,7 +60,7 @@ export class WakacjeScrapper implements Scrapper {
           const endDate = parseDate(endDateStr);
 
           const offerInfo = {
-            offerLink,
+            offerLink: `https://www.wakacje.pl${offerLink}`,
             title,
             destination,
             rating,
