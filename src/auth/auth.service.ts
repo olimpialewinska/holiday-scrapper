@@ -30,6 +30,10 @@ export class AuthService {
   }
 
   async register(user: any) {
+    const data = await this.usersService.findOne(user.email);
+    if (data !== null) {
+      return { error: 'User already exist' };
+    }
     return this.usersService.create(user);
   }
 
@@ -48,5 +52,9 @@ export class AuthService {
   async isEmailConfirmed(email: string): Promise<boolean> {
     const user = await this.usersService.findOne(email);
     return user?.emailVerified || false;
+  }
+
+  async changePassword(email: string, password: string) {
+    return this.usersService.changePassword(email, password);
   }
 }

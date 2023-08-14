@@ -27,7 +27,7 @@ export class AuthController {
 
   @Post('auth/register')
   async register(@Request() req) {
-    return this.authService.register(req.body);
+    return await this.authService.register(req.body);
   }
 
   @Get('auth/confirm/:email')
@@ -39,5 +39,9 @@ export class AuthController {
     } else {
       return { message: 'Email confirmation failed.' };
     }
+  }
+  @Post('auth/user/changePassword')
+  async changePassword(email: string, newPassword: string) {
+    return this.authService.changePassword(email, newPassword);
   }
 }

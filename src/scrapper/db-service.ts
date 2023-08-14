@@ -43,4 +43,6 @@ export class DbOfferService {
 
     return newOffers;
   }
+
+  public async getMaxPrice() {}
 }

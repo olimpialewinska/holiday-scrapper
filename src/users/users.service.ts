@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Users } from '../entities/User.js';
 import { EntityManager } from '@mikro-orm/postgresql';
-import { v4 as uuidv4 } from 'uuid';
 import { Preferences } from '../entities/Preferences.js';
 import { Offer } from '../entities/Offer.js';
 import { NodemailerService } from '../utils/nodemailer-config.js';
@@ -21,28 +20,35 @@ export class UsersService {
     }
   }
 
-  async create(user: any): Promise<Users> {
+  async changePassword(email: string, password: string) {
+    const user = await this.findOne(email);
+    user.password = password;
+    await this.em.persistAndFlush(user);
+  }
+
+  async create(user: any) {
     try {
       const newUser = new Users();
       newUser.email = user.email;
       newUser.password = user.password;
       await this.em.persistAndFlush(newUser);
-      const html = `<h1>Welcome to Travel Agency</h1>
+      const html = `<h1>BotHoliday - Email Confirmation</h1>
     <p>Thank you for registering on our website.</p>
     <p> Your account has been created. You can log in using the following credentials:</p>
     <p>Username: ${newUser.email}</p>
     <p>Password: ${newUser.password}</p>
     <p>Confirm your email address by clicking on the link below:</p>
     <a href="http://localhost:3000/auth/confirm/${newUser.email}">Confirm email</a>
-    <p>Have a nice day!</p>`;
+    <p>Have a nice day!</p>
+    <p>BotHoliday</p>`;
       await this.mailer.sendEmail(
         newUser.email,
-        'Welcome to Travel Agency',
+        'BotHoliday - Email Confirmation',
         html,
       );
       return newUser;
-    } catch (error) {
-      return error.message;
+    } catch {
+      return { error: 'Something went wrong' };
     }
   }
 

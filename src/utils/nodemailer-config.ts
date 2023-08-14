@@ -28,7 +28,6 @@ export class NodemailerService {
       subject: subject,
       html: html,
     };
-
     await transporter.sendMail(mailOptions);
   }
 }
