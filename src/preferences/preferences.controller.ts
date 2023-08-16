@@ -23,7 +23,7 @@ export class PreferencesController {
 
   @UseGuards(JwtAuthGuard)
   @Get('getAllOffers')
-  async getAllOffers(@Request() req) {
+  async getAllOffers() {
     return await this.preferencesService.getAllOffers();
   }
 }

@@ -20,12 +20,24 @@ export class AuthService {
   }
 
   async login(user: any) {
-    if (user.emailVerified === false) {
-      return { message: 'Email not verified.' };
+    const userdata = await this.usersService.checkIfExist(
+      user.email,
+      user.password,
+    );
+    if (!userdata) {
+      return { error: "User doesn't exists" };
     }
+    if (user.emailVerified === false) {
+      return { error: 'Email not verified.' };
+    }
+
+    const preferences = await this.usersService.getPreferences(user.email);
     const payload = { email: user.email, sub: user.userId };
     return {
-      access_token: this.jwtService.sign(payload),
+      id: userdata.id,
+      email: userdata.email,
+      preferences: preferences,
+      accessToken: this.jwtService.sign(payload),
     };
   }
 

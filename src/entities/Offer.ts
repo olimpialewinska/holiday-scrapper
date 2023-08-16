@@ -32,7 +32,7 @@ export class Offer {
   @Property({ length: 5000 })
   provider!: string;
 
-  @Property()
+  @Property({ length: 5000 })
   mealType!: string | '';
 
   @Property()

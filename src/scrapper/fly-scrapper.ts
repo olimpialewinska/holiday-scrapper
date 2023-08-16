@@ -33,12 +33,12 @@ export class FlyScrapper implements Scrapper {
             .get()
             .join('/');
           const ratingString =
-            offerElement
-              .find('.rating.rating-3')
-              .attr('class')
-              ?.split('-')[1] || '0';
+            offerElement.find('.rating').attr('class')?.split('-')[1] || '0';
 
           const rating = parseFloat(ratingString.replace(',', '.'));
+
+          const specificDiv = $(element).find('div i.icon-cutlery').parent();
+          const mealType = specificDiv.find('span').text().trim();
 
           const dateRange = $('div.info span').first().text().trim();
 
@@ -59,6 +59,8 @@ export class FlyScrapper implements Scrapper {
 
           const pricePerPerson = parseInt(pricePerPersonString, 10);
 
+          const image = $(element).find('a.image-link img').attr('data-src');
+
           const offerInfo = {
             offerLink,
             title,
@@ -69,8 +71,8 @@ export class FlyScrapper implements Scrapper {
             startDate,
             endDate,
             provider: 'https://fly.pl/',
-            image: 'a',
-            mealType: 'a',
+            image: image,
+            mealType: mealType,
           };
 
           items.push(offerInfo);

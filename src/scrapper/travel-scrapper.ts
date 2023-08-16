@@ -16,7 +16,7 @@ export class TravelScrapper implements Scrapper {
     const year = date.getFullYear();
 
     const dateStr = `${day}.${month}.${year}`;
-    const baseUrl = `https://www.travelplanet.pl/wakacje/?s_action=TRIPS_SEARCH&d_start_from=${dateStr}&nl_category_id%5B0%5D=1&nl_transportation_id%5B0%5D=3&s_holiday_target=tours&sort=c_price`;
+    const baseUrl = `https://www.travelplanet.pl/wakacje/?s_action=TRIPS_SEARCH&d_start_from=${dateStr}&nl_category_id%5B0%5D=1&nl_transportation_id%5B0%5D=3&s_holiday_target=tours&sort=c_price&nl_occupancy_adults=1`;
 
     const browser = await puppeteer.launch({
       headless: 'new',
@@ -99,6 +99,8 @@ export class TravelScrapper implements Scrapper {
 
           const provider = 'https://www.travelplanet.pl';
 
+          const image = $(element).find('img.img__img').attr('src');
+
           const destination = offerElement
             .find('p.b-product-list-2__location')
             .text()
@@ -115,7 +117,7 @@ export class TravelScrapper implements Scrapper {
             endDate,
             mealType,
             provider,
-            image: 'a',
+            image: image,
           };
 
           items.push(offerInfo);

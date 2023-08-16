@@ -30,15 +30,12 @@ export class WakacjeScrapper implements Scrapper {
             .find('span[data-testid="offer-listing-name"]')
             .first()
             .text();
-          const ratingString = $(element)
-            .find(
-              '.yzr5qg-2.klYBgC.nmbz4g-6.HhwrO .sc-jfJzZe.bcQBUy .sc-jSgupP.hKopHK',
-            )
-            .text();
+          const ratingElement = $(element)
+            .find('div.h04pl1-8.gONmLJ')
+            .attr('title');
 
-          const rating = ratingString
-            ? parseFloat(ratingString.replace(',', '.'))
-            : 0;
+          const rating = parseInt(ratingElement.split(' ')[0]);
+
           const duration = $(element)
             .find('span[data-testid="offer-listing-duration-date"]')
             .text()
@@ -59,6 +56,12 @@ export class WakacjeScrapper implements Scrapper {
           const startDate = parseDate(startDateStr);
           const endDate = parseDate(endDateStr);
 
+          const image = $(element).find('img.sc-1atahpb-3.kOWime').attr('src');
+          const mealType = $(element)
+            .find('span[data-testid="offer-listing-services"]')
+            .text()
+            .trim();
+
           const offerInfo = {
             offerLink: `https://www.wakacje.pl${offerLink}`,
             title,
@@ -69,8 +72,8 @@ export class WakacjeScrapper implements Scrapper {
             startDate: new Date(startDate),
             endDate: new Date(endDate),
             provider: 'https://www.wakacje.pl',
-            image: 'a',
-            mealType: 'a',
+            image: image,
+            mealType: mealType,
           };
 
           items.push(offerInfo);

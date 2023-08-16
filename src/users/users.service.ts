@@ -19,6 +19,16 @@ export class UsersService {
       return null;
     }
   }
+  async checkIfExist(
+    email: string,
+    password: string,
+  ): Promise<Users | undefined> {
+    try {
+      return await this.em.findOne(Users, { email: email, password: password });
+    } catch (error) {
+      return null;
+    }
+  }
 
   async changePassword(email: string, password: string) {
     const user = await this.findOne(email);
@@ -67,14 +77,29 @@ export class UsersService {
     return pref;
   }
 
-  async getPreferences(email: string): Promise<Preferences> {
-    return await this.em.findOne(Preferences, {
+  async getPreferences(email: string) {
+    const preferences = await this.em.findOne(Preferences, {
       userId: (await this.findOne(email)).id,
     });
+    if (!preferences) {
+      return null;
+    }
+
+    return {
+      destination: preferences.destination,
+      mealType: preferences.mealType,
+      duration: preferences.duration,
+      rating: preferences.rating,
+      price: preferences.pricePerPerson,
+    };
   }
 
   async getAllOffers() {
-    return await this.em.find(Offer, {});
+    return await this.em.find(
+      Offer,
+      {},
+      { orderBy: { pricePerPerson: 'ASC' } },
+    );
   }
 
   async update(user: Users) {
