@@ -4,6 +4,7 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { Preferences } from '../entities/Preferences.js';
 import { Offer } from '../entities/Offer.js';
 import { NodemailerService } from '../utils/nodemailer-config.js';
+import { ISearchQuery } from 'src/common/ISearchQuery.js';
 
 @Injectable()
 export class UsersService {
@@ -104,5 +105,46 @@ export class UsersService {
 
   async update(user: Users) {
     await this.em.persistAndFlush(user);
+  }
+
+  async getOffers(data: ISearchQuery) {
+    const filters: any = {};
+    let sort: any = {};
+
+    if (data.destination) {
+      filters.destination = { $ilike: `%${data.destination}%` };
+    }
+
+    if (data.maxPrice) {
+      filters.pricePerPerson = { $lt: data.maxPrice };
+    }
+
+    if (data.stars) {
+      filters.rating = { $gte: data.stars };
+    }
+
+    if (data.startDate) {
+      filters.startDate = data.startDate;
+    }
+
+    if (data.endDate) {
+      filters.endDate = data.endDate;
+    }
+
+    if (data.nutrition) {
+      filters.mealType = { $like: `%${data.nutrition}%` };
+    }
+
+    if (data.sort === 'asc') {
+      sort = { orderBy: { pricePerPerson: 'ASC' } };
+    } else if (data.sort === 'desc') {
+      sort = { orderBy: { pricePerPerson: 'DESC' } };
+    } else {
+      sort = { orderBy: { rating: 'DESC' } };
+    }
+
+    const offers = await this.em.find(Offer, filters, sort);
+
+    return offers;
   }
 }
