@@ -62,6 +62,8 @@ export class WakacjeScrapper implements Scrapper {
             .text()
             .trim();
 
+          const mealShort = this.unifyMealType(mealType);
+
           const offerInfo = {
             offerLink: `https://www.wakacje.pl${offerLink}`,
             title,
@@ -74,6 +76,7 @@ export class WakacjeScrapper implements Scrapper {
             provider: 'https://www.wakacje.pl',
             image: image,
             mealType: mealType,
+            mealShort,
           };
 
           items.push(offerInfo);
@@ -86,6 +89,25 @@ export class WakacjeScrapper implements Scrapper {
       return items;
     } catch (e) {
       return [];
+    }
+  }
+
+  private unifyMealType(mealType) {
+    switch (mealType) {
+      case 'All inclusive':
+        return 'All';
+      case 'śniadania i obiadokolacje':
+        return 'HB';
+      case 'śniadania':
+        return 'BB';
+      case 'trzy posiłki':
+        return 'FB';
+      case 'bez wyżywienia':
+        return 'RO';
+      case 'zgodnie z programem':
+        return 'AI';
+      default:
+        return '';
     }
   }
 }

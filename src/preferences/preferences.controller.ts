@@ -50,11 +50,28 @@ export class PreferencesController {
       destination,
       maxPrice,
       stars,
-      startDate,
+      startDate: startDate ? new Date(startDate) : null,
       endDate,
       nutrition,
       sort,
     };
+    console.log(data);
     return this.preferencesService.getOffers(data);
+  }
+
+  @Get('data')
+  async getDestinations() {
+    return {
+      destinations: await this.preferencesService.getDestinations(),
+      prices: await this.preferencesService.getPrices(),
+    };
+  }
+
+  @Post('dedicatedOffers')
+  async getDedicatedOffers(@Request() req) {
+    return await this.preferencesService.getDedicatedOffers(
+      req.body.email,
+      req.body.order,
+    );
   }
 }

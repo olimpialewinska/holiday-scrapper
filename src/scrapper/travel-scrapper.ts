@@ -78,6 +78,8 @@ export class TravelScrapper implements Scrapper {
             .text()
             .trim();
 
+          const mealShort = this.unifyMealType(mealType);
+
           const pricePerPersonString = offerElement
             .find('strong.price__highlight')
             .text()
@@ -118,6 +120,7 @@ export class TravelScrapper implements Scrapper {
             mealType,
             provider,
             image: image,
+            mealShort,
           };
 
           items.push(offerInfo);
@@ -166,5 +169,24 @@ export class TravelScrapper implements Scrapper {
       return new Date(year, month, day);
     }
     return null;
+  }
+
+  private unifyMealType(mealType) {
+    switch (mealType) {
+      case 'All inclusive':
+        return 'All';
+      case 'Dwa posiłki':
+        return 'HB';
+      case 'Śniadanie':
+        return 'BB';
+      case 'Kolacja':
+        return 'HB';
+      case 'Trzy posiłki':
+        return 'FB';
+      case 'Bez wyżywienia':
+        return 'RO';
+      default:
+        return '';
+    }
   }
 }

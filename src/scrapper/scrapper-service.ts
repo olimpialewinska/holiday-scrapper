@@ -38,6 +38,6 @@ export class ScrapperService {
     await this.run();
     setInterval(async () => {
       await this.run();
-    }, 1000 * 60 * 60);
+    }, 1000 * 60 * 10);
   }
 }

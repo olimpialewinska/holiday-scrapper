@@ -14,6 +14,7 @@ export interface Item {
   provider: string;
   mealType: string;
   image: string;
+  mealShort: string;
 }
 
 export function parseDate(dateStr: string): Date {

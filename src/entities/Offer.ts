@@ -36,5 +36,8 @@ export class Offer {
   mealType!: string | '';
 
   @Property()
+  mealShort!: string | '';
+
+  @Property()
   image!: string | '';
 }

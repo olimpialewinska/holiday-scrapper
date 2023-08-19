@@ -34,6 +34,7 @@ export class DbOfferService {
           newOffer.provider = offer.provider;
           newOffer.mealType = offer.mealType;
           newOffer.image = offer.image;
+          newOffer.mealShort = offer.mealShort;
 
           newOffers.push(newOffer);
           await this.em.persistAndFlush(newOffer);

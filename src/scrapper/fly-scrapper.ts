@@ -40,6 +40,8 @@ export class FlyScrapper implements Scrapper {
           const specificDiv = $(element).find('div i.icon-cutlery').parent();
           const mealType = specificDiv.find('span').text().trim();
 
+          const mealShort = this.unifyMealType(mealType);
+
           const dateRange = $('div.info span').first().text().trim();
 
           const dateRangePattern =
@@ -73,6 +75,7 @@ export class FlyScrapper implements Scrapper {
             provider: 'https://fly.pl/',
             image: image,
             mealType: mealType,
+            mealShort,
           };
 
           items.push(offerInfo);
@@ -86,5 +89,39 @@ export class FlyScrapper implements Scrapper {
       return [];
     }
     return items;
+  }
+
+  private unifyMealType(mealType) {
+    switch (mealType) {
+      case 'All Inclusive':
+        return 'All';
+      case 'Śniadania i obiadokolacje':
+      case 'Śniadania i obiadokolacje Plus':
+      case 'Half board':
+      case 'Half Board':
+      case 'Half board Plus':
+        return 'HB';
+      case 'Śniadania':
+      case 'Bed and Breakfast':
+      case 'Bed n Breakfast':
+      case 'Breakfast':
+      case 'Buffet Breakfast':
+        return 'BB';
+      case 'Full Board':
+      case 'Full Board Plus':
+      case 'Pełne wyżywienie':
+      case 'Pełne wyżywienie Plus':
+      case 'Pełne wyżywienie +':
+      case '3 posiłki':
+      case 'Śniadania, obiad, kolacja':
+      case 'trzy posiłki':
+        return 'FB';
+      case 'Room Only':
+      case 'Self Catering':
+      case 'Bez wyżywienia':
+        return 'RO';
+      default:
+        return '';
+    }
   }
 }
