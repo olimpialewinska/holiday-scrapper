@@ -94,9 +94,13 @@ export class FlyScrapper implements Scrapper {
   private unifyMealType(mealType) {
     switch (mealType) {
       case 'All Inclusive':
+      case 'All inclusive':
+      case 'All inclusive':
+      case 'All inclusive ultra':
         return 'All';
       case 'Śniadania i obiadokolacje':
       case 'Śniadania i obiadokolacje Plus':
+      case '2 posiłki':
       case 'Half board':
       case 'Half Board':
       case 'Half board Plus':
@@ -119,6 +123,7 @@ export class FlyScrapper implements Scrapper {
       case 'Room Only':
       case 'Self Catering':
       case 'Bez wyżywienia':
+      case 'Bez wyżywienia (Self Catering)':
         return 'RO';
       default:
         return '';

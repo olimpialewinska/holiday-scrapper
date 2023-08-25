@@ -32,8 +32,8 @@ export class PreferencesController {
 
   // @UseGuards(JwtAuthGuard)
   @Get('getAllOffers')
-  async getAllOffers() {
-    return await this.preferencesService.getAllOffers();
+  async getAllOffers(@Query('sort') sort: 'asc' | 'desc' | 'stars' | null) {
+    return await this.preferencesService.getAllOffers(sort);
   }
 
   @Get('offers')
@@ -50,12 +50,11 @@ export class PreferencesController {
       destination,
       maxPrice,
       stars,
-      startDate: startDate ? new Date(startDate) : null,
+      startDate,
       endDate,
       nutrition,
       sort,
     };
-    console.log(data);
     return this.preferencesService.getOffers(data);
   }
 

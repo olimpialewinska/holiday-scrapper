@@ -95,6 +95,7 @@ export class WakacjeScrapper implements Scrapper {
   private unifyMealType(mealType) {
     switch (mealType) {
       case 'All inclusive':
+      case 'All Inclusive':
         return 'All';
       case 'śniadania i obiadokolacje':
         return 'HB';

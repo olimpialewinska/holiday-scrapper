@@ -97,7 +97,7 @@ export class TravelScrapper implements Scrapper {
           if (widthMatch && widthMatch[1]) {
             width = parseInt(widthMatch[1], 10);
           }
-          const rating = width ? width / 12 : null;
+          const rating = width ? width / 12 : 0;
 
           const provider = 'https://www.travelplanet.pl';
 
@@ -163,12 +163,18 @@ export class TravelScrapper implements Scrapper {
   private parseCustomDate(dateStr: string): Date {
     const parts = dateStr.split('.');
     if (parts.length === 3) {
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
+      const day = this.addLeadingZero(parseInt(parts[0], 10));
+      const month = this.addLeadingZero(parseInt(parts[1], 10));
       const year = parseInt(parts[2], 10);
-      return new Date(year, month, day);
+      const date = year + '-' + month + '-' + day;
+
+      return new Date(date);
     }
     return null;
+  }
+
+  private addLeadingZero(value: number): string {
+    return value < 10 ? `0${value}` : value.toString();
   }
 
   private unifyMealType(mealType) {

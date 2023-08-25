@@ -3,6 +3,7 @@ import { UsersService } from '../users/users.service.js';
 import { ISearchQuery } from '../common/ISearchQuery.js';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Offer } from '../entities/Offer.js';
+import { start } from 'repl';
 
 @Injectable()
 export class PreferencesService {
@@ -19,11 +20,14 @@ export class PreferencesService {
     return await this.usersService.getPreferences(email);
   }
 
-  async getAllOffers(): Promise<any> {
+  async getAllOffers(order: 'asc' | 'desc' | 'stars'): Promise<any> {
+    const orderObj = this.getOrderObject(order);
     return await this.em.find(
       Offer,
       {},
-      { orderBy: { pricePerPerson: 'ASC' } },
+      {
+        orderBy: orderObj,
+      },
     );
   }
 
@@ -44,11 +48,13 @@ export class PreferencesService {
     }
 
     if (data.startDate) {
-      filters.startDate = data.startDate;
+      const startDate = new Date(data.startDate);
+      filters.startDate = { $gte: startDate };
     }
 
     if (data.endDate) {
-      filters.endDate = data.endDate;
+      const endDate = new Date(data.endDate);
+      filters.endDate = { $lte: endDate };
     }
 
     if (data.nutrition) {
@@ -57,15 +63,11 @@ export class PreferencesService {
       filters.mealShort = { $in: items };
     }
 
-    if (data.sort === 'asc') {
-      sort = { orderBy: { pricePerPerson: 'ASC' } };
-    } else if (data.sort === 'desc') {
-      sort = { orderBy: { pricePerPerson: 'DESC' } };
-    } else {
-      sort = { orderBy: { rating: 'DESC' } };
+    if (data.sort) {
+      sort = this.getOrderObject(data.sort);
     }
 
-    const offers = await this.em.find(Offer, filters, sort);
+    const offers = await this.em.find(Offer, filters, { orderBy: sort });
 
     return offers;
   }
@@ -111,6 +113,23 @@ export class PreferencesService {
     order: 'asc' | 'desc' | 'stars',
   ): Promise<any> {
     const preferences = await this.usersService.getPreferences(email);
+
+    const orderObj = this.getOrderObject(order);
+
+    const offers = await this.em.find(
+      Offer,
+      {
+        pricePerPerson: { $lt: preferences.price },
+      },
+      {
+        orderBy: orderObj,
+      },
+    );
+
+    return offers;
+  }
+
+  private getOrderObject(order: 'asc' | 'desc' | 'stars') {
     let orderObj;
 
     if (order === 'asc') {
@@ -121,18 +140,6 @@ export class PreferencesService {
       orderObj = { rating: 'DESC' };
     }
 
-    const offers = await this.em.find(
-      Offer,
-      {
-        destination: { $ilike: `%${preferences.destination}%` },
-        pricePerPerson: { $lt: preferences.price },
-        rating: { $gte: preferences.rating },
-      },
-      {
-        orderBy: orderObj,
-      },
-    );
-    console.log(offers);
-    return offers;
+    return orderObj;
   }
 }
