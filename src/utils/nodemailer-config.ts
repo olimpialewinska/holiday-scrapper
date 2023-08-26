@@ -9,12 +9,11 @@ export class NodemailerService {
   private createTransporter() {
     return nodemailer.createTransport({
       host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
-        type: 'OAuth2',
-        user: this.config.get('EMAIL_USER'),
-        clientId: this.config.get('OAUTH_CLIENT_ID'),
-        clientSecret: this.config.get('OAUTH_CLIENT_SECRET'),
-        refreshToken: this.config.get('OAUTH_REFRESH_TOKEN'),
+        user: '',
+        pass: '',
       },
     });
   }

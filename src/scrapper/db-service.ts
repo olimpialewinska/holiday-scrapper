@@ -1,6 +1,6 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
-import { Item } from './common.js';
+import { IPriceChange, Item } from './common.js';
 import { createTqdm } from '../utils/threads/tqdm.js';
 import { limitedArrayMap } from '../utils/threads/threads.js';
 import { Offer } from '../entities/Offer.js';
@@ -9,10 +9,13 @@ import { Offer } from '../entities/Offer.js';
 export class DbOfferService {
   constructor(private readonly em: EntityManager) {}
 
-  public async addOffer(offers: Item[]): Promise<Item[]> {
+  public async addOffer(
+    offers: Item[],
+  ): Promise<{ newOffers: Item[]; updatedOffers: IPriceChange[] }> {
     const tqdm = createTqdm(offers.length);
 
     const newOffers: Item[] = [];
+    const updatedOffers: IPriceChange[] = [];
 
     await limitedArrayMap(
       offers,
@@ -38,11 +41,21 @@ export class DbOfferService {
 
           newOffers.push(newOffer);
           await this.em.persistAndFlush(newOffer);
+        } else if (existingOffer.pricePerPerson !== offer.pricePerPerson) {
+          existingOffer.pricePerPerson = offer.pricePerPerson;
+          await this.em.flush();
+          updatedOffers.push({
+            oldOffer: existingOffer,
+            newPrice: offer.pricePerPerson,
+          });
         }
       }),
     );
 
-    return newOffers;
+    return {
+      newOffers,
+      updatedOffers,
+    };
   }
 
   public async getMaxPrice() {}

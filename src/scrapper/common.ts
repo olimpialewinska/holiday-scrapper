@@ -21,3 +21,8 @@ export function parseDate(dateStr: string): Date {
   const [day, month, year] = dateStr.split('.').map(Number);
   return new Date(Date.UTC(year, month - 1, day));
 }
+
+export interface IPriceChange {
+  oldOffer: Item;
+  newPrice: number;
+}
