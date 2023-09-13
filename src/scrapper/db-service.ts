@@ -4,6 +4,7 @@ import { IPriceChange, Item } from './common.js';
 import { createTqdm } from '../utils/threads/tqdm.js';
 import { limitedArrayMap } from '../utils/threads/threads.js';
 import { Offer } from '../entities/Offer.js';
+import { countries } from '../constants/countires.js';
 
 @Injectable()
 export class DbOfferService {
@@ -29,6 +30,7 @@ export class DbOfferService {
           newOffer.offerLink = offer.offerLink;
           newOffer.title = offer.title;
           newOffer.destination = offer.destination;
+          newOffer.countryCode = offer.countryCode;
           newOffer.rating = offer.rating;
           newOffer.pricePerPerson = offer.pricePerPerson;
           newOffer.duration = offer.duration;

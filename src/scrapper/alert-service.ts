@@ -37,7 +37,21 @@ export class AlertService {
         const matchingOffersUpdated: IPriceChange[] = [];
 
         offers.newOffers.forEach((offer: Item) => {
-          if (offer.pricePerPerson <= userPreferences.pricePerPerson) {
+          const durationMach = !userPreferences.duration
+            ? true
+            : this.matchDuration(
+                userPreferences.duration,
+                this.countDuration(offer.startDate, offer.endDate),
+              );
+          if (
+            offer.pricePerPerson <= userPreferences.pricePerPerson &&
+            offer.rating >= userPreferences.rating &&
+            (userPreferences.destination.length === 0 ||
+              userPreferences.destination.includes(offer.countryCode)) &&
+            (userPreferences.mealType.length === 0 ||
+              userPreferences.mealType.includes(offer.mealShort)) &&
+            durationMach
+          ) {
             matchingOffers.push(offer);
           }
         });
@@ -56,6 +70,30 @@ export class AlertService {
         }
       }),
     );
+  }
+
+  private countDuration(startDate: Date, endDate: Date): number {
+    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays;
+  }
+
+  private matchDuration(pref: number, duration: number) {
+    if (pref === 3 && duration <= 3) {
+      return true;
+    }
+    if (pref === 7 && duration <= 7) {
+      return true;
+    }
+    if (pref === 14 && duration <= 14) {
+      return true;
+    }
+    if (pref === 21 && duration <= 21) {
+      return true;
+    }
+
+    return true;
   }
 
   async getAllUsers(): Promise<Users[]> {

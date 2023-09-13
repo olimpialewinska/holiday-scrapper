@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Item, Scrapper, parseDate } from './common.js';
 import * as cheerio from 'cheerio';
 import { exec } from '../utils/child_process.js';
+import { countries } from '../constants/countires.js';
 
 @Injectable()
 export class WakacjeScrapper implements Scrapper {
@@ -31,7 +32,7 @@ export class WakacjeScrapper implements Scrapper {
             .first()
             .text();
           const ratingElement = $(element)
-            .find('div.h04pl1-8.gONmLJ')
+            .find('div.ctm1ix-9.bTrdyn')
             .attr('title');
 
           const rating = parseInt(ratingElement.split(' ')[0]);
@@ -64,6 +65,10 @@ export class WakacjeScrapper implements Scrapper {
 
           const mealShort = this.unifyMealType(mealType);
 
+          const countryCode = countries.find(
+            (country) => country.country === destination.split(/\/|\s/)[0],
+          ).code;
+
           const offerInfo = {
             offerLink: `https://www.wakacje.pl${offerLink}`,
             title,
@@ -77,6 +82,7 @@ export class WakacjeScrapper implements Scrapper {
             image: image,
             mealType: mealType,
             mealShort,
+            countryCode,
           };
 
           items.push(offerInfo);
@@ -88,6 +94,7 @@ export class WakacjeScrapper implements Scrapper {
       }
       return items;
     } catch (e) {
+      console.log(e);
       return [];
     }
   }

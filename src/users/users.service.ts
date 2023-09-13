@@ -20,6 +20,14 @@ export class UsersService {
       return null;
     }
   }
+
+  async findPreferences(userId: number): Promise<Preferences | undefined> {
+    try {
+      return await this.em.findOne(Preferences, { userId: userId });
+    } catch (error) {
+      return null;
+    }
+  }
   async checkIfExist(
     email: string,
     password: string,
@@ -67,14 +75,36 @@ export class UsersService {
     email: string,
     preferences: Preferences,
   ): Promise<Preferences> {
+    console.log('xd');
+    console.log(preferences);
+    console.log(email);
     const user = await this.findOne(email);
 
-    let pref = new Preferences();
+    if (!user) {
+      return null;
+    }
 
-    pref.userId = user.id;
-    pref.pricePerPerson = preferences.pricePerPerson;
+    const pref = await this.findPreferences(user.id);
 
-    await this.em.persistAndFlush(pref);
+    if (pref) {
+      pref.destination = preferences.destination;
+      pref.duration = preferences.duration;
+      pref.mealType = preferences.mealType;
+      pref.rating = preferences.rating;
+      pref.pricePerPerson = preferences.pricePerPerson;
+      await this.em.persistAndFlush(pref);
+      return pref;
+    }
+
+    let newPref = new Preferences();
+    newPref.userId = user.id;
+    newPref.destination = preferences.destination;
+    newPref.duration = preferences.duration;
+    newPref.mealType = preferences.mealType;
+    newPref.rating = preferences.rating;
+    newPref.pricePerPerson = preferences.pricePerPerson;
+
+    await this.em.persistAndFlush(newPref);
     return pref;
   }
 

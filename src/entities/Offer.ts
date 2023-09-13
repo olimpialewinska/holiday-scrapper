@@ -14,6 +14,9 @@ export class Offer {
   @Property({ length: 5000 })
   destination!: string;
 
+  @Property()
+  countryCode!: string;
+
   @Property({ nullable: true })
   rating!: number;
 

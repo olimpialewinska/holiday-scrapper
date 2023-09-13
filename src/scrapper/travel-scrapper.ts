@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Item, Scrapper } from './common.js';
 import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
+import { count } from 'console';
+import { countries } from '../constants/countires.js';
 
 @Injectable()
 export class TravelScrapper implements Scrapper {
@@ -108,6 +110,10 @@ export class TravelScrapper implements Scrapper {
             .text()
             .trim();
 
+          const countryCode = countries.find(
+            (country) => country.country === destination.split(/\/|\s/)[0],
+          ).code;
+
           const offerInfo = {
             offerLink,
             title,
@@ -115,6 +121,7 @@ export class TravelScrapper implements Scrapper {
             rating,
             pricePerPerson,
             duration,
+            countryCode,
             startDate,
             endDate,
             mealType,

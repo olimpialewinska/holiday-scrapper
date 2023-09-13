@@ -7,7 +7,7 @@ export class Preferences {
   userId!: number;
 
   @Property({ nullable: true })
-  destination!: string;
+  destination!: string[];
 
   @Property({ nullable: true })
   rating!: number;
@@ -16,17 +16,8 @@ export class Preferences {
   pricePerPerson!: number;
 
   @Property({ nullable: true })
-  duration!: string;
+  duration!: number;
 
   @Property({ nullable: true })
-  startDate!: Date;
-
-  @Property({ nullable: true })
-  endDate!: Date;
-
-  @Property({ nullable: true })
-  provider!: string;
-
-  @Property({ nullable: true })
-  mealType!: string;
+  mealType!: string[];
 }

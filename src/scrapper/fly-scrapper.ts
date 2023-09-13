@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Item, Scrapper, parseDate } from './common.js';
 import { exec } from '../utils/child_process.js';
 import * as cheerio from 'cheerio';
+import { countries } from '../constants/countires.js';
 
 @Injectable()
 export class FlyScrapper implements Scrapper {
@@ -63,6 +64,10 @@ export class FlyScrapper implements Scrapper {
 
           const image = $(element).find('a.image-link img').attr('data-src');
 
+          const countryCode = countries.find(
+            (country) => country.country === destination.split(/\/|\s/)[0],
+          ).code;
+
           const offerInfo = {
             offerLink,
             title,
@@ -70,6 +75,7 @@ export class FlyScrapper implements Scrapper {
             rating,
             pricePerPerson,
             duration,
+            countryCode,
             startDate,
             endDate,
             provider: 'https://fly.pl/',

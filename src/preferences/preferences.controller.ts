@@ -15,12 +15,12 @@ import { ISearchQuery } from 'src/common/ISearchQuery.js';
 export class PreferencesController {
   constructor(private readonly preferencesService: PreferencesService) {}
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post('addPreferences')
   async addPreferences(@Request() req) {
     return await this.preferencesService.addPreferences(
-      req.body.email,
-      req.body.preferences,
+      req.body.data.email,
+      req.body.data.preferences,
     );
   }
 

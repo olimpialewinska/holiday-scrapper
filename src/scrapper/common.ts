@@ -6,6 +6,7 @@ export interface Item {
   offerLink: string;
   title: string;
   destination: string;
+  countryCode: string;
   rating: number;
   pricePerPerson: number;
   duration: string;

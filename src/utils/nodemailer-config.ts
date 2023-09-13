@@ -12,8 +12,8 @@ export class NodemailerService {
       port: 465,
       secure: true,
       auth: {
-        user: '',
-        pass: '',
+        user: this.config.get('EMAIL_USER'),
+        pass: this.config.get('EMAIL_PASS'),
       },
     });
   }
