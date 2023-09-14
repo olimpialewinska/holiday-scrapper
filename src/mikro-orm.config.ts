@@ -20,7 +20,6 @@ export class MikroOrmConfigService {
       host: 'localhost',
       port: 5432,
       entitiesTs: ['./src/entities'],
-      debug: true,
     };
   }
 }

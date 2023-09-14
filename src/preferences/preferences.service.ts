@@ -119,14 +119,24 @@ export class PreferencesService {
     const offers = await this.em.find(
       Offer,
       {
-        pricePerPerson: { $lt: preferences.price },
+        pricePerPerson: { $lte: preferences.price },
+        rating: { $gte: preferences.rating },
+        countryCode: { $in: preferences.destination },
+        mealShort: { $in: preferences.mealType },
       },
       {
         orderBy: orderObj,
       },
     );
 
-    return offers;
+    const matchingOffers = offers.filter((offer) => {
+      const duration = this.countDuration(offer.startDate, offer.endDate);
+      return this.matchDuration(preferences.duration, duration);
+    });
+
+    console.log(matchingOffers);
+
+    return matchingOffers;
   }
 
   private getOrderObject(order: 'asc' | 'desc' | 'stars') {
@@ -141,5 +151,29 @@ export class PreferencesService {
     }
 
     return orderObj;
+  }
+
+  private countDuration(startDate: Date, endDate: Date): number {
+    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays;
+  }
+
+  private matchDuration(pref: number, duration: number) {
+    if (pref === 3 && duration <= 3) {
+      return true;
+    }
+    if (pref === 7 && duration <= 7) {
+      return true;
+    }
+    if (pref === 14 && duration <= 14) {
+      return true;
+    }
+    if (pref === 21 && duration <= 21) {
+      return true;
+    }
+
+    return true;
   }
 }
