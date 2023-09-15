@@ -6,8 +6,6 @@ import { TravelScrapper } from './travel-scrapper.js';
 import { DbOfferService } from './db-service.js';
 import { AlertService } from './alert-service.js';
 
-const maxPrice = 1000;
-
 @Injectable()
 export class ScrapperService {
   constructor(
@@ -23,18 +21,15 @@ export class ScrapperService {
   }
 
   public async run(): Promise<void> {
+    const maxPrice = await this.dbService.getMaxPrice();
     const promises = this.scrappers.map((scrapper) => scrapper.fetch(maxPrice));
     const allItems = await Promise.all(promises);
 
     const items = allItems.flat();
 
-    console.log('Found', items.length, 'offers');
-
     const newOffers = await this.dbService.addOffer(items);
 
     await this.alertService.sendOffers(newOffers);
-
-    console.log('Finished running scrapper');
   }
   public async startScheduledScraping(): Promise<void> {
     await this.run();

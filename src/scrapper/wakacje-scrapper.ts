@@ -94,7 +94,6 @@ export class WakacjeScrapper implements Scrapper {
       }
       return items;
     } catch (e) {
-      console.log(e);
       return [];
     }
   }

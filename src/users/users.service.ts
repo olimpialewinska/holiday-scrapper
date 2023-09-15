@@ -75,9 +75,6 @@ export class UsersService {
     email: string,
     preferences: Preferences,
   ): Promise<Preferences> {
-    console.log('xd');
-    console.log(preferences);
-    console.log(email);
     const user = await this.findOne(email);
 
     if (!user) {

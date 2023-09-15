@@ -5,6 +5,7 @@ import { createTqdm } from '../utils/threads/tqdm.js';
 import { limitedArrayMap } from '../utils/threads/threads.js';
 import { Offer } from '../entities/Offer.js';
 import { countries } from '../constants/countires.js';
+import { Preferences } from '../entities/Preferences.js';
 
 @Injectable()
 export class DbOfferService {
@@ -60,5 +61,15 @@ export class DbOfferService {
     };
   }
 
-  public async getMaxPrice() {}
+  public async getMaxPrice(): Promise<number> {
+    const maxPrice = await this.em.execute(
+      `
+      SELECT MAX(price_per_person) FROM preferences
+      group by price_per_person
+      order by price_per_person desc limit 1;
+    `,
+    );
+
+    return maxPrice[0].max ? maxPrice[0].max : 3000;
+  }
 }

@@ -134,8 +134,6 @@ export class PreferencesService {
       return this.matchDuration(preferences.duration, duration);
     });
 
-    console.log(matchingOffers);
-
     return matchingOffers;
   }
 
